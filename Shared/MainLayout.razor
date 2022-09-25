@@ -1,0 +1,37 @@
+﻿@inherits LayoutComponentBase
+
+<Popup @ref="popupRef" />
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <a @onclick="RedirectPage">About</a>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+    private Popup popupRef;
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        popupRef.Show("This engine reads a “poem” from a file and " +
+        "answers whether or not it is a valid haiku poem.", "About");
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    private void RedirectPage()
+    {
+        // Shows the popup at the center of the screen
+        popupRef.Show("This engine reads a “poem” from a file and " +
+        "answers whether or not it is a valid haiku poem.", "About");
+    }
+}

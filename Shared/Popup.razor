@@ -1,0 +1,53 @@
+﻿@{
+    var showClass = IsVisible ? "d-block" : "d-none";
+}
+
+<div class="p-3 @showClass" data-bs-autohide="true" data-bs-delay="5000">
+    <div style="width:auto" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <h2 class="me-auto">@HeaderText</h2>
+            <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
+        </div>
+
+        <div class="toast-body">
+            @BodyText
+            <h4>Rules</h4>
+            <ul>
+                <li>A vowel – A, E, I, O, or U – corresponds to a syllable in the word.</li>
+                <li>As an exception to (1), any pair of consecutive vowels only counts as one syllable, not two.</li>
+                <li>A “Y” that appears at the end of a word is also a vowel.</li>
+                <li>An “E” at the end of a word is “silent” and not a vowel if the word contains another vowel.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsVisibleChanged { get; set; }
+
+    [Parameter]
+    public string? HeaderText { get; set; }
+
+    [Parameter]
+    public string? BodyText { get; set; }
+
+    public void Show(string bodyText, string headerText = "")
+    {
+        HeaderText = headerText;
+        BodyText = bodyText;
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+    private void Close()
+    {
+        HeaderText = string.Empty;
+        BodyText = string.Empty;
+        IsVisible = false;
+        StateHasChanged();
+    }
+}

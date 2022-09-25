@@ -1,0 +1,85 @@
+﻿@using Microsoft.AspNetCore.Components;
+@using Microsoft.AspNetCore.Components.Web;
+@using HaikuPoems;
+
+@page "/"
+<h3>HaikuVerify</h3>
+
+<InputFile OnChange="OnInputFileChange" multiple />
+<div style="padding-top: 10px;">
+    <button @onclick="ReadFiles" class="learn-more">Process Poems</button>
+</div>
+
+@if(poems.Count>0){
+    
+        @foreach (var poem in poems)
+        {
+            <div style="display:flex;">
+                <div style="flex-basis:50%">
+                    <h3>@poem.Title</h3>
+                    <ul style="border:solid 2px black;list-style-type: none;">
+                        <li>
+                            @poem.PoemList[0]
+                        </li>
+                        <li>
+                            @poem.PoemList[1]
+                        </li>
+                        <li>
+                            @poem.PoemList[2]
+                        </li>
+                    </ul>
+                </div>
+                @if (@poem.isHaiku())
+                {
+                    <div style="flex-basis:50%">
+                        <h4 style="color:green">Valid haiku</h4>
+                    </div>
+                }
+                else{
+                    <div style="flex-basis:50%">
+                        <h4 style="color:red">Not a haiku poem</h4>
+                        <p style="white-space:pre-line">@poem.Results.ToString()</p>
+                    </div>
+                }
+
+            </div>
+        }   
+}
+@code {
+    string Message = "No file(s) selected";
+    IReadOnlyList<IBrowserFile> selectedFiles;
+    List<Poem> poems = new List<Poem>();
+
+    private void OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        selectedFiles = e.GetMultipleFiles();
+        Message = $"{selectedFiles.Count} file(s) selected";
+        this.StateHasChanged();
+    }
+
+    private async void ReadFiles()
+    {
+        poems.Clear();
+        if (selectedFiles!=null)
+        {
+            foreach (var file in selectedFiles)
+            {
+                List<string> poemLines = new List<string>();
+                using (var fileReader = new StreamReader(file.OpenReadStream()))
+                {
+                    for (string line; (line = await fileReader.ReadLineAsync()) != null;){
+                        poemLines.Add(line);
+                    }                  
+                }
+                Poem poem = new Poem(poemLines);
+                poem.Title = file.Name;
+                poem.processHaiku();
+                poems.Add(poem);
+            }
+            Message = $"{selectedFiles.Count} file(s) verified.";
+        }
+
+        this.StateHasChanged();
+    }
+
+}
